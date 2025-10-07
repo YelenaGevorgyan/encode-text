@@ -1,0 +1,34 @@
+pip install pyotp qrcode[pil]
+import pyotp
+import qrcode
+
+# 1️⃣ Создаём секретный ключ (он нужен для генерации кодов)
+secret = pyotp.random_base32()
+print("Ваш секретный ключ:", secret)
+
+# 2️⃣ Создаём TOTP-объект
+totp = pyotp.TOTP(secret)
+
+# 3️⃣ Генерируем ссылку для Authenticator (для QR-кода)
+uri = totp.provisioning_uri(name="Yelena@example.com", issuer_name="MyPythonApp")
+
+# 4️⃣ Создаём QR-код
+qrcode.make(uri).save("totp_qr.png")
+print("QR-код сохранён как 'totp_qr.png'. Отсканируйте его в Google Authenticator.")
+
+# 5️⃣ Показываем текущий код
+print("Ваш текущий одноразовый пароль:", totp.now())
+
+# 6️⃣ Проверяем введённый код
+user_code = input("Введите код из приложения: ")
+
+if totp.verify(user_code):
+    print("✅ Код правильный! Доступ разрешён.")
+else:
+    print("❌ Код неверный.")
+
+Ваш секретный ключ: 7HVPYHYUBIF334A5W7E46L5XPMBERCT6
+QR-код сохранён как 'totp_qr.png'. Отсканируйте его в Google Authenticator.
+Ваш текущий одноразовый пароль: 304283
+Введите код из приложения: 788145
+✅ Код правильный! Доступ разрешён.
